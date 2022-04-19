@@ -1,59 +1,27 @@
-require 'timeout'
-require_relative '../lib/first_spicy_batch'
+def first_spicy_batch(n)
+  # assign left to be the first batch and right to be the last (n)th batch
+  left = 0
+  right = n
 
-describe '#first_spicy_batch' do
-  it 'returns 4 when the first spicy batch is 4' do
-    def is_spicy_batch(batch)
-      batch >= 4
+  # our batches are sorted, so all the spicy batches will be at the end of the list
+  # and all non-spicy batches will be at the beginning.
+  # loop through values in the list the value of left is no longer less than the value of right
+  while left < right
+    # start our search in the middle of the list
+    mid = left + (right - left) / 2
+
+    # run our helper method and check if the middle batch is spicy
+    if is_spicy_batch(mid)
+      # if the middle batch is spicy, we reassign right to be the value
+      # of mid (since we know all batches to the right of mid are spicy)
+      right = mid
+    else
+      # otherwise, we assign left to be the value of mid + 1, because
+      # we already know that mid is not spicy
+      left = mid + 1
     end
-    expect(first_spicy_batch(5)).to eq(4)
-    expect(first_spicy_batch(6)).to eq(4)
-    expect(first_spicy_batch(7)).to eq(4)
-    expect(first_spicy_batch(8)).to eq(4)
   end
 
-  it 'returns 8 when the first spicy batch is 8' do
-    def is_spicy_batch(batch)
-      batch >= 8
-    end
-    expect(first_spicy_batch(8)).to eq(8)
-    expect(first_spicy_batch(9)).to eq(8)
-    expect(first_spicy_batch(10)).to eq(8)
-    expect(first_spicy_batch(11)).to eq(8)
-    expect(first_spicy_batch(12)).to eq(8)
-  end
-
-  it 'returns 1 when the first spicy batch is 1' do
-    def is_spicy_batch(batch)
-      batch >= 1
-    end
-    expect(first_spicy_batch(1)).to eq(1)
-    expect(first_spicy_batch(4)).to eq(1)
-    expect(first_spicy_batch(10)).to eq(1)
-  end
-
-  it 'returns 100 when the first spicy batch is 100' do
-    def is_spicy_batch(batch)
-      batch >= 100
-    end
-    expect(first_spicy_batch(100)).to eq(100)
-    expect(first_spicy_batch(8000)).to eq(100)
-  end
-
-  it 'handles large inputs' do
-    # This is a very large number
-    FIXNUM_MAX = (2**(0.size * 8 - 2) - 1)
-
-    def is_spicy_batch(batch)
-      batch >= FIXNUM_MAX
-    end
-
-    # This checks that the first_spicy_batch method completes execution in 5 seconds or less
-    expect { Timeout.timeout(5) { first_spicy_batch(FIXNUM_MAX) } }.not_to(
-      raise_error(Timeout::Error),
-      'Time limit exceeded',
-    )
-
-    expect(first_spicy_batch(FIXNUM_MAX)).to eq(FIXNUM_MAX)
-  end
+  # return left, which will be the first spicy batch!
+  left
 end
